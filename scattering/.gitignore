@@ -1,0 +1,12 @@
+/*.tar.gz
+/tmp
+/usr
+/Make-user
+/research/finitediffs/local/
+
+*.m~
+
+.DS_Store
+*.pkf
+
+*.mat

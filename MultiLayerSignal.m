@@ -35,12 +35,18 @@ x2 = filtfilt(b,1,y);       % Zero-phase digital filtering
 
 
 x =x1+x2+x3+x4;
+M = 256;
+a = (M)/2;
+g = gabwin({'tight', 'hann'},a,M);
+X = dgtreal(x,g,a,M);
 
-
+figure;
+imagesc(10*log10(abs(X)),[-50 10]);
 
 
 x = x.';
 y = x(1000:7000);
+figure
 plot(y);
 %%
 

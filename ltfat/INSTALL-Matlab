@@ -1,0 +1,63 @@
+-------- Compatibility ----------------------------------
+
+The toolbox should work and compile on all versions of Matlab later than 2009b.
+
+-------- Compiling the MEX interfaces  ------------------
+
+LTFAT comes with C Mex interfaces written for all computationally
+intensitive function in the toolbox.
+
+To compile the Mex-interfaces, type "ltfatmex" on the Matlab command
+prompt. This will compile all the available mex-functions.
+
+If you have downloaded a binary release, everything is already
+compiled and you should not need to do anything else.
+
+The Mex-files links to certain libraries, most importantly to the
+LTFAT C-library. In order to compile the Mex-interfaces, you must
+first compile the C library.  The "ltfatmex" will
+automatically build the library if you have installed the correct
+libraries.
+
+--------- Compiling on MacOS -------------------------------------------
+
+On MacOS, you must have the gcc compiler and the FFTW libraries
+installed. Then just type "ltfatmex" and everything should work.
+
+--------- Compiling on Microsoft Windows -------------------------------
+
+On Windows, you will need to do the following: 
+
+- Download and unpack binaries of the FFTW library from
+  http://www.fftw.org/install/windows.html. Copy all *.dll files to the 
+  ltfat/mex directory.
+  
+- Download and install TDM-GCC compiler suite from
+  http://tdm-gcc.tdragon.net/download. Ensure that the [MinGW]/bin 
+  directory is in the system PATH, where [MinGW] stands for instalation direcory.
+  
+- Run "ltfatmex".
+
+Both 32bit and 64bit Windows are supported. Please use appropriate versions
+of FFTW and TDM-GCC.
+
+--------- Compiling libltfat on Linux ------------------------------------
+
+On Linux / Unix, the "ltfatmex" script will automatically compile the
+ltfat C library. You can also perform this step manually by doing the
+following steps:
+
+- Open a terminal, and change to the ltfat/src directory (using 'cd')
+
+- Type 'make'
+
+The mex interfaces must be linked to some external libraries, which
+are all standard packages in most Linux distributions. This is the
+FFTW, LAPACK and BLAS libraries:
+
+- On Redhat / Fedora, install the packages 'fftw-devel',
+  'lapack-devel' and 'blas-devel' and their dependcies.
+
+- On Debian / Ubuntu, install the packages 'libfftw3-dev',
+  'libblas-dev' and 'liblapack-dev'.
+

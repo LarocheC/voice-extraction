@@ -9,8 +9,8 @@ t = 0:1/fs:5; % 5 secs @ 4000Hz sample rate
 T = 2.5; T1 =4;
 f1 = 131 ; f3 = 262 ;
 
-x1 = 0.5*synth(f1,t,3).*(1-heaviside(t-3));
-x2 = 0.5*(heaviside(t-2)).* synth(f3,t,3); 
+x1 = 0.5*generate_harmonics(f1,t,3).*(1-heaviside(t-3));
+x2 = 0.5*(heaviside(t-2)).* generate_harmonics(f3,t,3); 
 x3 = 2*(heaviside(t-1)-heaviside(t-1.1)+heaviside(t-2)-heaviside(t-2.1))...
     .* rand(1,length(t)); %synth(f2,t,5);
 x4 = 0.5*(heaviside(t-3)-heaviside(t-3.3)+heaviside(t-4)-heaviside(t-4.3)) .* rand(1,length(t));

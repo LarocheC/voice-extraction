@@ -10,7 +10,7 @@ T1 = 4;
 f1 = 131;
 f3 = 262;
 
-harmonic_1 = 0.5 * heaviside(t-3) .* generate_harmonics(f1, t, 3);
+harmonic_1 = 0.5 * (1 - heaviside(t-3)) .* generate_harmonics(f1, t, 3);
 harmonic_2 = 0.5 * heaviside(t-2) .* generate_harmonics(f3, t, 3); 
 
 noise_1 = 2.0 * (heaviside(t-1) - heaviside(t-1.1)) .* rand(1, length(t));

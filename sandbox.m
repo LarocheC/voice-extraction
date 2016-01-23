@@ -14,9 +14,11 @@ opts{1}.time.has_duals = true;
 opts{1}.time.is_chunked = false;
 opts{1}.time.is_phi_gaussian = true;
 opts{1}.time.size = 32768;
-opts{1}.is_phi_gaussian = true;
-opts{2}.is_phi_gaussian = true;
-opts{2}.time.nFilters_per_octave = 1;
+opts{1}.time.is_phi_gaussian = true;
+opts{2}.time.is_phi_gaussian = true;
+opts{2}.time.has_duals = true;
+opts{2}.time.nFilters_per_octave = 2;
+opts{2}.time.max_scale = Inf;
 opts{2}.time.is_phi_gaussian = true;
 archs = sc_setup(opts);
 

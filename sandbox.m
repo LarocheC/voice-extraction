@@ -18,7 +18,8 @@ opts{1}.time.is_phi_gaussian = true;
 opts{2}.time.is_phi_gaussian = true;
 opts{2}.time.has_duals = true;
 opts{2}.time.nFilters_per_octave = 2;
-opts{2}.time.max_scale = Inf;
+opts{2}.time.cutoff_in_dB = 2;
+opts{2}.time.max_scale = length(x);
 opts{2}.time.is_phi_gaussian = true;
 archs = sc_setup(opts);
 
@@ -65,7 +66,7 @@ max_iter = 1000;
 
 X = Smat_1;
 
-%% Lunch SPNMF With a noise dictionary
+%% Launch SPNMF With a noise dictionary
 
 [ W, H2, e] = SPNMF_KL_W2TRAIN( X , W , W2, H2 , max_iter);
 
@@ -75,3 +76,5 @@ figure
 subplot(131); imagesc((W*W'*Smat_1));
 subplot(132); imagesc((W2*H2));
 subplot(133); imagesc((W*W'*Smat_1+W2*H2));
+
+%%

@@ -89,4 +89,8 @@ for lambda1 = 1:length(U1_perc.data)
     Y1_perc.data{lambda1} = U1_perc.data{lambda1} .* ...
         Y{1+0}{end}.data{lambda1} ./ abs(Y{1+0}{end}.data{lambda1});
 end
-%%
+Y0_perc = Y{1+0}{1};
+Y0_perc.data = complex(zeros(size(Y0_perc.data)));
+Y0_perc.data_ft = complex(zeros(size(Y0_perc.data_ft)));
+Y0_perc = dual_scatter_dY(Y1_perc, archs{1}.banks{1}, Y0_perc);
+x_perc = real(Y0_perc.data);

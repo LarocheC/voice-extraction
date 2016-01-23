@@ -81,4 +81,6 @@ subplot(133); imagesc((W*W'*Smat_1+W2*H2));
 Smat1_perc = W2 * H2;
 S1_perc = S{1+1};
 S1_perc.data = Smat1_perc.';
-Y1_perc = dS_backto_dY(S1_perc, archs{1});
+Y2_perc = dS_backto_dY(S1_perc, archs{1});
+Y2_perc = copy_metadata(Y{1+1}{1}, Y2_perc);
+U1_perc = dY_backto_dU(Y2_perc);

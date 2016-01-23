@@ -33,14 +33,14 @@ refs_2 = generate_refs(S{1+2}.data, spatial_subscripts, S{1+2}.ranges{1+0});
 %% Convert scattering nodes to matrices
 nFrames = size(S{1+1}.data, 1);
 nRefs_1 = size(refs_1, 2);
-Smat_1 = zeros(nFrames, nRefs_1);
+Smat_1 = zeros(nRefs_1, nFrames);
 for ref1 = 1:nRefs_1
-    Smat_1(:, ref1) = subsref(S{1+1}.data, refs_1(:, ref1));
+    Smat_1(ref1, :) = subsref(S{1+1}.data, refs_1(:, ref1));
 end
 nRefs_2 = size(refs_2, 2);
-Smat_2 = zeros(nFrames, nRefs_2);
+Smat_2 = zeros(nRefs_2, nFrames);
 for ref2 = 1:nRefs_2
-    Smat_2(:, ref2) = subsref(S{1+2}.data, refs_2(:, ref2));
+    Smat_2(ref2, :) = subsref(S{1+2}.data, refs_2(:, ref2));
 end
 
 Smat_1(Smat_1<0)=0;
@@ -49,13 +49,13 @@ Smat_2(Smat_2<0)=0;
 Smat_1 = Smat_1./(norm(Smat_1,2)+eps);
 Smat_2(Smat_2<0)=0;
 
-% subplot(121); imagesc((Smat_1'));
-% subplot(122); imagesc((Smat_2'));
+% subplot(121); imagesc((Smat_1));
+% subplot(122); imagesc((Smat_2));
 
 
 %% Create parameters
-[F1,T1]=size(Smat_1');
-[F2,T2]=size(Smat_2');
+[F1,T1]=size(Smat_1);
+[F2,T2]=size(Smat_2);
 
 
 W = rand(F1,4);
@@ -63,7 +63,7 @@ W2 = rand(F1,2);
 H2 = rand(2,T1);
 max_iter = 1000;
 
-X = Smat_1';
+X = Smat_1;
 
 %% Lunch SPNMF With a noise dictionary
 
@@ -72,6 +72,6 @@ X = Smat_1';
 plot(e);
 
 figure
-subplot(131); imagesc((W*W'*Smat_1'));
+subplot(131); imagesc((W*W'*Smat_1));
 subplot(132); imagesc((W2*H2));
-subplot(133); imagesc((W*W'*Smat_1'+W2*H2));
+subplot(133); imagesc((W*W'*Smat_1+W2*H2));

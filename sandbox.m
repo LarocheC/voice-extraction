@@ -8,9 +8,10 @@ opts{1}.time.T = 8192;
 opts{1}.time.nFilters_per_octave = 8;
 opts{1}.time.has_duals = true;
 opts{1}.time.is_chunked = false;
+opts{1}.time.is_phi_gaussian = true;
 opts{1}.time.size = 32768;
-opts{2}.time = struct();
 opts{2}.time.nFilters_per_octave = 1;
+opts{2}.time.is_phi_gaussian = true;
 archs = sc_setup(opts);
 
 %% Compute scattering transform

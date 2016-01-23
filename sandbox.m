@@ -86,7 +86,7 @@ Y2_perc = copy_metadata(Y{1+1}{1}, Y2_perc);
 U1_perc = dY_backto_dU(Y2_perc);
 Y1_perc = Y{1+0}{end};
 for lambda1 = 1:length(U1_perc.data)
-    Y1_perc.data{lambda1} = ...
-        U1_perc.data{lambda1} .* angle(Y1_perc.data{lambda1});
+    Y1_perc.data{lambda1} = U1_perc.data{lambda1} .* ...
+        Y{1+0}{end}.data{lambda1} ./ abs(Y{1+0}{end}.data{lambda1});
 end
 %%

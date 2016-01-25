@@ -20,9 +20,9 @@ harmonic_1 = 0.5 * amplitude_1 .* generate_harmonics(f3, t, 3);
 harmonic_2 = 0.5 * amplitude_2 .* generate_harmonics(f1, t, 3);
 
 noise_1 = 2.0 * (heaviside(t-1) - heaviside(t-1.05)) .* (rand(1, length(t))-0.5);
-noise_2 = 1.0 * (heaviside(t-2) - heaviside(t-2.1)) .* (rand(1, length(t))-0.5);
-noise_3 = 0.5 * (heaviside(t-3) - heaviside(t-3.2)) .* (rand(1, length(t))-0.5);
-noise_4 = 0.5 * (heaviside(t-4) - heaviside(t-4.4)) .* (rand(1, length(t))-0.5);
+noise_2 = 2.0 * (heaviside(t-2) - heaviside(t-2.1)) .* (rand(1, length(t))-0.5);
+noise_3 = 2.0 * (heaviside(t-3) - heaviside(t-3.2)) .* (rand(1, length(t))-0.5);
+noise_4 = 2.0 * (heaviside(t-4) - heaviside(t-4.4)) .* (rand(1, length(t))-0.5);
 
 noise = noise_1 + noise_2 + noise_3 + noise_4;
 
@@ -37,7 +37,5 @@ chirp_2 = 0 * (heaviside(t-2.5) - heaviside(t-3.5)) .* harmochirp;
 probe = harmonic_1 + harmonic_2 + ...
         noise_1 + noise_2 + noise_3 + noise_4 + ...
         chirp_1 + chirp_2;
-    plot(t,probe)
-    soundsc(probe, fs)
 end
 

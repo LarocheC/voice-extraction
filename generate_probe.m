@@ -7,8 +7,8 @@ t = 0:1/fs:5; % 5 secs @ 4000Hz sample rate
 
 T = 2.5;
 T1 = 4;
-f1 = 131;
-f3 = 262;
+f1 = 130.813; %C3
+f3 = 220.000; %A3
 
 harmonic_1 = 0.5 * (1 - heaviside(t-3)) .* generate_harmonics(f1, t, 3);
 harmonic_2 = 0.5 * heaviside(t-2) .* generate_harmonics(f3, t, 3); 

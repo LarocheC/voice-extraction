@@ -5,9 +5,9 @@ noise = noise(1:32768).';
 
 %% Setup filter banks
 clear opts;
-phi_log2_oversampling = 6;
+phi_log2_oversampling = 1;
 phi_oversampling = pow2(phi_log2_oversampling);
-nmf_log2_oversampling = 6;
+nmf_log2_oversampling = 1;
 
 opts{1}.time.T = 8192;
 opts{1}.time.nFilters_per_octave = 8;
@@ -45,16 +45,16 @@ for ref2 = 1:nRefs_2
     Smat_2(ref2, :) = subsref(S{1+2}.data, refs_2(:, ref2));
 end
 
-% Update the toolbox behavior so that it adapts to resampled inputs
-archs{2}.banks{1}.behavior.S.log2_oversampling = nmf_log2_oversampling;
-archs{2}.invariants{1}.behavior.S.log2_oversampling = nmf_log2_oversampling;
-S{1+1}.ranges{1+0}(2,1) = S{1+1}.ranges{1+0}(2,1) * downsampling;
-
 % Downsample manually
 nmf_oversampling = pow2(nmf_log2_oversampling);
 downsampling = phi_oversampling / nmf_oversampling;
 Smat_1 = Smat_1(:, 1:downsampling:end);
 Smat_2 = Smat_2(:, 1:downsampling:end);
+
+% Update the toolbox behavior so that it adapts to resampled inputs
+archs{2}.banks{1}.behavior.S.log2_oversampling = nmf_log2_oversampling;
+archs{2}.invariants{1}.behavior.S.log2_oversampling = nmf_log2_oversampling;
+S{1+1}.ranges{1+0}(2,1) = S{1+1}.ranges{1+0}(2,1) * downsampling;
 
 % Ensure non-negativity
 Smat_1(Smat_1<0)=0;
@@ -65,37 +65,55 @@ subplot(122); imagesc((Smat_2));
 set(gcf, 'WindowStyle', 'docked');
 
 % Create parameters
-[F1,T1]=size(Smat_1);
-[F2,T2]=size(Smat_2);
+[F1, T] = size(Smat_1);
+F2 = size(Smat_2, 1);
+F = F1 + F2;
 
 
-W = rand(F1,4);
-W2 = rand(F1,2);
-H2 = rand(2,T1);
+W_harmo = rand(F, 4);
+W_perc = rand(F, 2);
+H_perc = rand(2, T);
 max_iter = 200;
 
-X = Smat_1;
+Smat = cat(1, Smat_1, Smat_2);
 
 %% Launch SPNMF With a noise dictionary
 
-[ W, H2, e] = SPNMF_KL_W2TRAIN( X , W , W2, H2 , max_iter);
+[W_harmo, H_perc, e] = ...
+    SPNMF_KL_W2TRAIN(Smat, W_harmo, W_perc, H_perc, max_iter);
 
 subplot(111);
 plot(e);
 
-%%
+Smat_perc = W_perc * H_perc;
+Smat1_perc = Smat_perc(1:F1, :);
+Smat2_perc = Smat_perc((F1+1):end, :);
 
-Smat1_perc = W2 * H2;
+%% Fill in scattering network corresponding to percussive part
 S1_perc = S{1+1};
-S1_perc.data = Smat1_perc.';
+for ref_1_index = 1:length(refs_1)
+    ref_1 = refs_1(:, ref_1_index);
+    row = Smat_1(ref_1_index, :);
+    S1_perc.data = subsasgn(S1_perc.data, ref_1, row);
+end
+
+S2_perc = S{1+2};
+for ref_2_index = 1:length(refs_2)
+    ref_2 = refs_2(:, ref_2_index);
+    row = Smat_2(ref_2_index, :);
+    S2_perc.data = subsasgn(S2_perc.data, ref_2, row);
+end
+
+%%
 Y2_perc = dS_backto_dY(S1_perc, archs{2});
 Y2_perc = copy_metadata(Y{1+1}{1}, Y2_perc);
 U1_perc = dY_backto_dU(Y2_perc);
-Y1_perc = Y{1+0}{end};
+Y1_perc = Y{1}{end};
 for lambda1 = 1:length(U1_perc.data)
     Y1_perc.data{lambda1} = U1_perc.data{lambda1} .* ...
-        Y{1+0}{end}.data{lambda1} ./ abs(Y{1+0}{end}.data{lambda1});
+        Y{1}{end}.data{lambda1} ./ abs(Y{1}{end}.data{lambda1});
 end
+
 Y0_perc = Y{1+0}{1};
 Y0_perc.data = complex(zeros(size(Y0_perc.data)));
 Y0_perc.data_ft = complex(zeros(size(Y0_perc.data_ft)));

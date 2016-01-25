@@ -2,9 +2,9 @@ close all
 
 
 %% Generate probe signal
-probe = generate_probe(6554);
+[probe, noise] = generate_probe(6554);
 x = probe(1:32768).';
-
+noise = noise(1:32768).';
 
 %% Setup filter banks
 clear opts;
@@ -45,11 +45,8 @@ end
 Smat_1(Smat_1<0)=0;
 Smat_2(Smat_2<0)=0;
 
-Smat_1 = Smat_1./(norm(Smat_1,2)+eps);
-Smat_2(Smat_2<0)=0;
-
-% subplot(121); imagesc((Smat_1));
-% subplot(122); imagesc((Smat_2));
+subplot(121); imagesc((Smat_1));
+subplot(122); imagesc((Smat_2));
 
 
 %% Create parameters
@@ -60,7 +57,7 @@ Smat_2(Smat_2<0)=0;
 W = rand(F1,4);
 W2 = rand(F1,2);
 H2 = rand(2,T1);
-max_iter = 1000;
+max_iter = 200;
 
 X = Smat_1;
 
@@ -92,3 +89,9 @@ Y0_perc.data = complex(zeros(size(Y0_perc.data)));
 Y0_perc.data_ft = complex(zeros(size(Y0_perc.data_ft)));
 Y0_perc = dual_scatter_dY(Y1_perc, archs{1}.banks{1}, Y0_perc);
 x_perc = real(Y0_perc.data);
+
+
+plot(x_perc - noise);
+
+
+

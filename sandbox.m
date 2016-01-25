@@ -8,7 +8,10 @@ noise = noise(1:32768).';
 
 %% Setup filter banks
 clear opts;
-opts{1}.time.T = 1024;
+log2_oversampling = 6;
+oversampling = pow2(log2_oversampling);
+
+opts{1}.time.T = 8192;
 opts{1}.time.nFilters_per_octave = 8;
 opts{1}.time.has_duals = true;
 opts{1}.time.is_chunked = false;
@@ -19,10 +22,12 @@ opts{2}.time.nFilters_per_octave = 2;
 opts{2}.time.cutoff_in_dB = 2;
 opts{2}.time.max_scale = length(x);
 opts{2}.time.is_phi_gaussian = true;
+opts{2}.time.S_log2_oversampling = log2_oversampling;
 archs = sc_setup(opts);
 
-%% Compute scattering transform
+% Compute scattering transform
 [S, U, Y] = sc_propagate(x, archs);
+
 
 %% Generate references
 spatial_subscripts = 1;
@@ -34,7 +39,7 @@ nFrames = size(S{1+1}.data, 1);
 nRefs_1 = size(refs_1, 2);
 Smat_1 = zeros(nRefs_1, nFrames);
 for ref1 = 1:nRefs_1
-    Smat_1(ref1, :) = subsref(S{1+1}.data, refs_1(:, ref1));
+    Smat_1(ref1, :) = subsref(S{1+1}.data, refs_1(1:oversampling:end, ref1));
 end
 nRefs_2 = size(refs_2, 2);
 Smat_2 = zeros(nRefs_2, nFrames);

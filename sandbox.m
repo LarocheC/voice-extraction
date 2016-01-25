@@ -5,11 +5,11 @@ noise = noise(1:32768).';
 
 %% Setup filter banks
 clear opts;
-phi_log2_oversampling = 1;
+phi_log2_oversampling = 2;
 phi_oversampling = pow2(phi_log2_oversampling);
-nmf_log2_oversampling = 1;
+nmf_log2_oversampling = 2;
 
-opts{1}.time.T = 8192;
+opts{1}.time.T = 1024;
 opts{1}.time.nFilters_per_octave = 8;
 opts{1}.time.has_duals = true;
 opts{1}.time.is_chunked = false;
@@ -123,7 +123,7 @@ for lambda1 = 1:length(U1fromS1_perc.data)
     Y1_perc.data{lambda1} = U1_perc.data{lambda1} .* ...
         Y{1}{end}.data{lambda1} ./ abs(Y{1}{end}.data{lambda1});
 end
-%%
+%
 Y0_perc = Y{1+0}{1};
 Y0_perc.data = complex(zeros(size(Y0_perc.data)));
 Y0_perc.data_ft = complex(zeros(size(Y0_perc.data_ft)));
@@ -131,9 +131,9 @@ Y0_perc = dual_scatter_dY(Y1_perc, archs{1}.banks{1}, Y0_perc);
 x_perc = real(Y0_perc.data);
 
 
-plot(x_perc - noise);
+plot(x_perc);
 
 %%
 subplot(131); imagesc((W_perc*H_perc));
-
+subplot(132); imagesc(Smat);
 

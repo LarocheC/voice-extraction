@@ -71,16 +71,17 @@ F2 = size(Smat_2, 1);
 F = F1 + F2;
 
 W_harmo = rand(F, 4);
-W_perc = rand(F, 2);
-H_perc = rand(2, T);
+load('NoiseDictscattering');
+W_perc = Wtrain;
+H_perc = rand(1, T);
 max_iter = 200;
 
 Smat = cat(1, Smat_1, Smat_2);
 
 % SPNMF with no training permute the two layer in the synthetic case. 
 
-[W_harmo, W_perc, H_perc, e] = ...
-    SPNMF_KL(Smat, W_harmo, W_perc, H_perc, max_iter);
+[W_harmo, H_perc, e] = ...
+    SPNMF_KL_W2TRAIN(Smat, W_harmo, W_perc, H_perc, max_iter);
 
 subplot(111);
 plot(e);
@@ -160,15 +161,18 @@ X = dgtreal(x,g,a,M);
 
 
 [F, T] = size(X);
-Wini = rand(F, 4);
-WPini = rand(F, 2);
-HPini = rand(2, T);
+Wini = rand(F,2);
+HPini = rand(2,T);
+load('NoiseDictSTFT');
+WP = Wtrain;
+load('NoiseDictSTFT2');
+WP = [WP Wtrain];
 max_iter = 200;
 
 % SPNMF with no training permute the two layer in the synthetic case. 
 
-[W, WP, HP, e] = ...
-    SPNMF_KL(abs(X).^2, Wini, WPini, HPini, max_iter);
+[W, HP, e] = ...
+    SPNMF_KL_W2TRAIN(abs(X).^2, Wini, WP, HPini, max_iter);
 
 
 subplot(121); imagesc(10*log10(W*W'*abs(X)),[-50 10]);
@@ -184,5 +188,3 @@ DrumEst = idgtreal(((WP*HP).^2./(V+eps)).*(X),g,a,M,Ls);
 HarmoEst = idgtreal((((W*W'*abs(X)).^2)./(V+eps)).*(X),g,a,M,Ls);
 
 [SDRstft,SIRstft,SARstft,perm]=bss_eval_sources([DrumEst' ; HarmoEst'], s);
-
-

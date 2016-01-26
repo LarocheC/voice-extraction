@@ -77,11 +77,16 @@ max_iter = 200;
 
 Smat = cat(1, Smat_1, Smat_2);
 
-[W_harmo, H_perc, e] = ...
-    SPNMF_KL_W2TRAIN(Smat, W_harmo, W_perc, H_perc, max_iter);
+% SPNMF with no training permute the two layer in the synthetic case. 
+
+[W_harmo, W_perc, H_perc, e] = ...
+    SPNMF_KL(Smat, W_harmo, W_perc, H_perc, max_iter);
 
 subplot(111);
 plot(e);
+
+subplot(121); imagesc(W_harmo*W_harmo'*Smat);
+subplot(122); imagesc(W_perc * H_perc)
 
 Smat_perc = W_perc * H_perc;
 Smat1_perc = Smat_perc(1:F1, :);
@@ -131,7 +136,13 @@ Y0_perc = dual_scatter_dY(Y1_perc, archs{1}.banks{1}, Y0_perc);
 x_perc = real(Y0_perc.data);
 
 
-plot(x_perc);
+%% Compute BSS score
+
+se = [x_perc' ; x'-x_perc'];
+s = [noise' ; x'-noise'];
+
+[SDR,SIR,SAR,perm]=bss_eval_sources(se,s);
+
 
 %%
 subplot(131); imagesc((W_perc*H_perc));

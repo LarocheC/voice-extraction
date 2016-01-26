@@ -62,7 +62,7 @@ Smat_2(Smat_2<0)=0;
 
 subplot(121); imagesc((Smat_1));
 subplot(122); imagesc((Smat_2));
-set(gcf, 'WindowStyle', 'docked');
+%set(gcf, 'WindowStyle', 'docked');
 
 %% % Launch SPNMF With a noise dictionary
 % Create parameters
@@ -85,7 +85,7 @@ Smat = cat(1, Smat_1, Smat_2);
 subplot(111);
 plot(e);
 
-subplot(121); imagesc(W_harmo*W_harmo'*Smat);
+subplot(121); imagesc(W_harmo*W_harmo'*Smat,[0 35]);
 subplot(122); imagesc(W_perc * H_perc)
 
 Smat_perc = W_perc * H_perc;
@@ -145,6 +145,44 @@ s = [noise' ; x'-noise'];
 
 
 %%
-subplot(131); imagesc((W_perc*H_perc));
-subplot(132); imagesc(Smat);
+% subplot(131); imagesc((W_perc*H_perc));
+% subplot(132); imagesc(Smat);
+
+
+%% STFT comparison 
+
+% parameters
+M = 1024;
+a = M/2;
+g = gabwin({'tight', 'hann'}, a, M);
+Ls = length(x);
+X = dgtreal(x,g,a,M);
+
+
+[F, T] = size(X);
+Wini = rand(F, 4);
+WPini = rand(F, 2);
+HPini = rand(2, T);
+max_iter = 200;
+
+% SPNMF with no training permute the two layer in the synthetic case. 
+
+[W, WP, HP, e] = ...
+    SPNMF_KL(abs(X).^2, Wini, WPini, HPini, max_iter);
+
+
+subplot(121); imagesc(10*log10(W*W'*abs(X)),[-50 10]);
+subplot(122); imagesc(10*log10(WP * HP),[-50 10])
+
+
+% Wiener Filtering and reconstruction of the signal
+
+V = (W*W'*abs(X)).^2 + (WP*HP).^2 ;
+
+DrumEst = idgtreal(((WP*HP).^2./(V+eps)).*(X),g,a,M,Ls);
+
+HarmoEst = idgtreal((((W*W'*abs(X)).^2)./(V+eps)).*(X),g,a,M,Ls);
+
+[SDRstft,SIRstft,SARstft,perm]=bss_eval_sources([DrumEst' ; HarmoEst'], s);
+
 

@@ -109,6 +109,7 @@ for ref_2_index = 1:length(refs_2)
 end
 
 %%
+
 Y2_perc = dS_backto_dY(S1_perc, archs{2});
 Y2_perc = copy_metadata(Y{1+1}{1}, Y2_perc);
 U1fromS1_perc = dY_backto_dU(Y2_perc);
@@ -120,14 +121,14 @@ U2_perc = dY_backto_dU(Y3_perc);
 Y2_perc = Y{2}{end};
 for lambda2 = 1:length(U2_perc.data)
     Y2_perc.data{lambda2} = U2_perc.data{lambda2} .* ...
-        Y{2}{end}.data{lambda2} ./ abs(Y{2}{end}.data{lambda2});
+        Y{2}{end}.data{lambda2} ./ U{1+2}.data{lambda2};
 end
 
 Y1_perc = dual_scatter_dY(Y2_perc, archs{2}.banks{1}, U1fromS1_perc);
 U1_perc = dY_backto_dU(Y1_perc);
 for lambda1 = 1:length(U1fromS1_perc.data)
     Y1_perc.data{lambda1} = U1_perc.data{lambda1} .* ...
-        Y{1}{end}.data{lambda1} ./ abs(Y{1}{end}.data{lambda1});
+        Y{1}{end}.data{lambda1} ./ U{1+1}.data{lambda1};
 end
 %
 Y0_perc = Y{1+0}{1};

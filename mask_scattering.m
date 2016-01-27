@@ -3,7 +3,7 @@ function x_source = mask_scattering( ...
 Y2_source = dS_backto_dY(S1_source, archs{2});
 Y2_source = copy_metadata(Y_mixture{1+1}{1}, Y2_source);
 U1fromS1_source = dY_backto_dU(Y2_source);
-U1fromS1_source = perform_ft(U1fromS1_perc, archs{1}.banks{1}.behavior.key);
+U1fromS1_source = perform_ft(U1fromS1_source, archs{1}.banks{1}.behavior.key);
 
 Y3_source = dS_backto_dY(S2_source, archs{3});
 Y3_source = copy_metadata(Y_mixture{1+2}{1}, Y3_source);

@@ -109,33 +109,7 @@ for ref_2_index = 1:length(refs_2)
 end
 
 %%
-
-Y2_perc = dS_backto_dY(S1_perc, archs{2});
-Y2_perc = copy_metadata(Y{1+1}{1}, Y2_perc);
-U1fromS1_perc = dY_backto_dU(Y2_perc);
-U1fromS1_perc = perform_ft(U1fromS1_perc, archs{1}.banks{1}.behavior.key);
-
-Y3_perc = dS_backto_dY(S2_perc, archs{3});
-Y3_perc = copy_metadata(Y{1+2}{1}, Y3_perc);
-U2_perc = dY_backto_dU(Y3_perc);
-Y2_perc = Y{2}{end};
-for lambda2 = 1:length(U2_perc.data)
-    Y2_perc.data{lambda2} = U2_perc.data{lambda2} .* ...
-        Y{2}{end}.data{lambda2} ./ U{1+2}.data{lambda2};
-end
-
-Y1_perc = dual_scatter_dY(Y2_perc, archs{2}.banks{1}, U1fromS1_perc);
-U1_perc = dY_backto_dU(Y1_perc);
-for lambda1 = 1:length(U1fromS1_perc.data)
-    Y1_perc.data{lambda1} = U1_perc.data{lambda1} .* ...
-        Y{1}{end}.data{lambda1} ./ U{1+1}.data{lambda1};
-end
-%
-Y0_perc = Y{1+0}{1};
-Y0_perc.data = complex(zeros(size(Y0_perc.data)));
-Y0_perc.data_ft = complex(zeros(size(Y0_perc.data_ft)));
-Y0_perc = dual_scatter_dY(Y1_perc, archs{1}.banks{1}, Y0_perc);
-x_perc = real(Y0_perc.data);
+x_perc = mask_scattering(S1_perc, S2_perc, U, Y, archs);
 
 
 %% Compute BSS score

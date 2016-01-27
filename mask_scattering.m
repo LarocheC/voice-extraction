@@ -1,5 +1,5 @@
 function x_source = mask_scattering( ... 
-    S1_source, S2_source, U_mixture, Y_mixture,archs)
+    S1_source, S2_source, U_mixture, Y_mixture, archs)
 Y2_source = dS_backto_dY(S1_source, archs{2});
 Y2_source = copy_metadata(Y_mixture{1+1}{1}, Y2_source);
 U1fromS1_source = dY_backto_dU(Y2_source);

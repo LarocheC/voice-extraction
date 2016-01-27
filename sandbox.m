@@ -4,69 +4,85 @@ phi_log2_oversampling = 6;
 phi_oversampling = pow2(phi_log2_oversampling);
 nmf_log2_oversampling = 3;
 
-opts{1}.time.T = 8192;
-opts{1}.time.nFilters_per_octave = 8;
-opts{1}.time.has_duals = true;
-opts{1}.time.is_chunked = false;
-opts{1}.time.is_phi_gaussian = true;
-opts{1}.time.size = 32768;
-opts{1}.time.S_log2_oversampling = phi_log2_oversampling;
-opts{2}.time.has_duals = true;
-opts{2}.time.nFilters_per_octave = 2;
-opts{2}.time.cutoff_in_dB = 2;
-opts{2}.time.max_scale = 32768;
-opts{2}.time.is_phi_gaussian = true;
-opts{2}.time.S_log2_oversampling = phi_log2_oversampling;
-archs = sc_setup(opts);
+function archs = make_archs(N, T, nFilters_per_octave)
+    phi_log2_oversampling = log2(N/T); % check me
+    opts{1}.time.T = T;
+    opts{1}.time.nFilters_per_octave = nFilters_per_octave;
+    opts{1}.time.has_duals = true;
+    opts{1}.time.is_chunked = false;
+    opts{1}.time.is_phi_gaussian = true;
+    opts{1}.time.size = N;
+    opts{1}.time.S_log2_oversampling = phi_log2_oversampling;
+    opts{2}.time.has_duals = true;
+    opts{2}.time.nFilters_per_octave = 2;
+    opts{2}.time.cutoff_in_dB = 2;
+    opts{2}.time.max_scale = N;
+    opts{2}.time.is_phi_gaussian = true;
+    opts{2}.time.S_log2_oversampling = phi_log2_oversampling;
+    archs = sc_setup(opts);
+end
 
 %% Generate probe signal
 [probe, noise] = generate_probe(6554);
 x = probe(1:32768).';
 noise = noise(1:32768).';
 
-% Compute scattering transform
-[S, U, Y] = sc_propagate(x, archs);
 
-%% Downsample manually
-nmf_oversampling = pow2(nmf_log2_oversampling);
-downsampling = phi_oversampling / nmf_oversampling;
-S{1+1}.data = downsampling * S{1+1}.data(1:downsampling:end, :);
-S{1+1}.ranges{1+0}(2,1) = S{1+1}.ranges{1+0}(2,1) * downsampling;
-archs{1}.banks{1}.behavior.S.log2_oversampling = nmf_log2_oversampling;
-archs{1}.invariants{1}.behavior.S.log2_oversampling = nmf_log2_oversampling;
-for lambda2 = 1:length(S{1+2}.data)
-    S{1+2}.data{lambda2} = downsampling * ...
-        S{1+2}.data{lambda2}(1:downsampling:end, :);
-    S{1+2}.ranges{1+0}{lambda2}(2,1) = ...
-        S{1+2}.ranges{1+0}{lambda2}(2,1) * downsampling;
+function [S, U, Y] = scattering(x, archs, nmf_log2_oversampling)
+    % Compute scattering transform
+    [S, U, Y] = sc_propagate(x, archs);
+
+    %% Downsample manually
+    phi_oversampling = 2^opts{1}.time.S_log2_oversampling
+    nmf_oversampling = pow2(nmf_log2_oversampling);
+    downsampling = phi_oversampling / nmf_oversampling;
+    S{1+1}.data = downsampling * S{1+1}.data(1:downsampling:end, :);
+    S{1+1}.ranges{1+0}(2,1) = S{1+1}.ranges{1+0}(2,1) * downsampling;
+    archs{1}.banks{1}.behavior.S.log2_oversampling = nmf_log2_oversampling;
+    archs{1}.invariants{1}.behavior.S.log2_oversampling = nmf_log2_oversampling;
+    for lambda2 = 1:length(S{1+2}.data)
+        S{1+2}.data{lambda2} = downsampling * ...
+            S{1+2}.data{lambda2}(1:downsampling:end, :);
+        S{1+2}.ranges{1+0}{lambda2}(2,1) = ...
+            S{1+2}.ranges{1+0}{lambda2}(2,1) * downsampling;
+    end
 end
-archs{2}.banks{1}.behavior.S.log2_oversampling = nmf_log2_oversampling;
-archs{2}.invariants{1}.behavior.S.log2_oversampling = nmf_log2_oversampling;
+
+function archs = downsample_archs(archs, nmf_log2_oversampling)
+archs{2}.banks{1}.behavior.S.log2_oversampling = ...
+    nmf_log2_oversampling;
+archs{2}.invariants{1}.behavior.S.log2_oversampling = ...
+    nmf_log2_oversampling;
 archs{3}.invariants{1}.behavior.S.log2_oversampling = ...
-    nmf_log2_oversampling; 
-
-
-% Generate references
-spatial_subscripts = 1;
-refs_1 = generate_refs(S{1+1}.data, spatial_subscripts, S{1+1}.ranges{1+0});
-refs_2 = generate_refs(S{1+2}.data, spatial_subscripts, S{1+2}.ranges{1+0});
-
-% Convert scattering nodes to matrices
-nFrames = size(S{1+1}.data, 1);
-nRefs_1 = size(refs_1, 2);
-Smat_1 = zeros(nRefs_1, nFrames);
-for ref1 = 1:nRefs_1
-    Smat_1(ref1, :) = subsref(S{1+1}.data, refs_1(ref1));
-end
-nRefs_2 = size(refs_2, 2);
-Smat_2 = zeros(nRefs_2, nFrames);
-for ref2 = 1:nRefs_2
-    Smat_2(ref2, :) = subsref(S{1+2}.data, refs_2(:, ref2));
+    nmf_log2_oversampling;
 end
 
-% Ensure non-negativity
-Smat_1(Smat_1<0)=0;
-Smat_2(Smat_2<0)=0;
+
+function [Smat_1, Smat_2] = format_scattering(S)
+    % Generate references
+    spatial_subscripts = 1;
+    refs_1 = ...
+        generate_refs(S{1+1}.data, spatial_subscripts, S{1+1}.ranges{1+0});
+    refs_2 = ...
+        generate_refs(S{1+2}.data, spatial_subscripts, S{1+2}.ranges{1+0});
+
+    % Convert scattering nodes to matrices
+    nFrames = size(S{1+1}.data, 1);
+    nRefs_1 = size(refs_1, 2);
+    Smat_1 = zeros(nRefs_1, nFrames);
+    for ref1 = 1:nRefs_1
+        Smat_1(ref1, :) = subsref(S{1+1}.data, refs_1(ref1));
+    end
+    nRefs_2 = size(refs_2, 2);
+    Smat_2 = zeros(nRefs_2, nFrames);
+    for ref2 = 1:nRefs_2
+        Smat_2(ref2, :) = subsref(S{1+2}.data, refs_2(:, ref2));
+    end
+
+    % Ensure non-negativity
+    Smat_1(Smat_1<0)=0;
+    Smat_2(Smat_2<0)=0;
+end
 
 subplot(121); imagesc((Smat_1));
 subplot(122); imagesc((Smat_2));

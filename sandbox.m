@@ -37,7 +37,6 @@ F = F1 + F2;
 
 xtrain = rand(32768,1);
 W_perc = CreateDictionaryScattering(noise, archs, phi_log2_oversampling, nmf_log2_oversampling,'mean');
-
 W_harmo = rand(F, 4);
 
 H_perc = rand(size(W_perc,2), T);
@@ -123,6 +122,8 @@ a = M/2;
 g = gabwin({'tight', 'hann'}, a, M);
 Ls = length(x);
 X = dgtreal(x,g,a,M);
+Xnoise = dgtreal(noise,g,a,M);
+Xharmo = dgtreal(harmonic,g,a,M);
 
 
 [F, T] = size(X);
@@ -143,11 +144,16 @@ subplot(122); imagesc(10*log10(WP * HP),[-50 10])
 
 
 % Wiener Filtering and reconstruction of the signal
+%V_harmo = (W*W'*abs(X)).^2;
+%V_perc = (WP*HP).^2;
 
-V = (W*W'*abs(X)).^2 + (WP*HP).^2 ;
+V_harmo = abs(Xharmo).^2; %oracle case
+V_perc = abs(Xnoise).^2; %oracle case
 
-DrumEst = idgtreal(((WP*HP).^2./(V+eps)).*(X),g,a,M,Ls);
+V = V_harmo + V_perc;
 
-HarmoEst = idgtreal((((W*W'*abs(X)).^2)./(V+eps)).*(X),g,a,M,Ls);
+DrumEst = idgtreal((V_perc./(V+eps)).*(X),g,a,M,Ls);
+
+HarmoEst = idgtreal((V_harmo./(V+eps)).*(X),g,a,M,Ls);
 
 [SDRstft,SIRstft,SARstft,perm]=bss_eval_sources([DrumEst' ; HarmoEst'], s);

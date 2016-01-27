@@ -57,12 +57,15 @@ subplot(122); imagesc(W_perc * H_perc)
 %% Begin reconstruction 
 
 Smat_perc = Smat_percOracle; % case oracle
+Smat_harmo = Smat_harmoOracle; % case oracle
+
+%Smat_harmo = W_harmo*W_harmo'*Smat;
 %Smat_perc = W_perc * H_perc;
+
+
 Smat1_perc = Smat_perc(1:F1, :);
 Smat2_perc = Smat_perc((F1+1):end, :);
 
-Smat_harmo = Smat_harmoOracle; % case oracle
-%Smat_harmo = W_harmo*W_harmo'*Smat;
 Smat1_harmo = Smat_harmo(1:F1, :);
 Smat2_harmo = Smat_harmo((F1+1):end, :);
 

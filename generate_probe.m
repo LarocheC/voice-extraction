@@ -1,4 +1,4 @@
-function [probe, noise] = generate_probe(fs)
+function [probe, noise, harmonic] = generate_probe(fs)
 if nargin<1
     fs = 4000;
 end
@@ -18,6 +18,8 @@ amplitude_2 = amplitude_2 / max(amplitude_2);
 
 harmonic_1 = 0.5 * amplitude_1 .* generate_harmonics(f3, t, 3); 
 harmonic_2 = 0.5 * amplitude_2 .* generate_harmonics(f1, t, 3);
+
+harmonic = harmonic_1 + harmonic_2;
 
 noise_1 = 2.0 * (heaviside(t-1) - heaviside(t-1.05)) .* (rand(1, length(t))-0.5);
 noise_2 = 2.0 * (heaviside(t-2) - heaviside(t-2.1)) .* (rand(1, length(t))-0.5);

@@ -21,7 +21,7 @@ for iter=1:max_iter
     
     H2 = H2 .* ((W2'*X) ./ (W2'*(W*W'*X + W2*H2+eps) +eps)) ;
     
-    e(iter) = idiv(X , W*W'*X + W2*H2);
+    %e(iter) = idiv(X , W*W'*X + W2*H2);
 
     if mod(iter,100)==0
         display(strcat('Niter',num2str(iter)));

@@ -2,20 +2,15 @@
 clear opts;
 phi_log2_oversampling = 9;
 phi_oversampling = pow2(phi_log2_oversampling);
-nmf_log2_oversampling = 6;
+nmf_log2_oversampling = 2;
 
-N = 2^20;
-T = 4096;
+N = 2^19;
+T = 2048;
 nFilters_per_octave = 8;
 
 archs = make_archs(N, T, nFilters_per_octave, phi_log2_oversampling);
 
 %% Generate probe signal
-% [probe, noise, harmonic] = generate_probe(6554);
-% x = probe(1:32768).';
-% noise = noise(1:32768).';
-% harmonic = harmonic(1:32768).';
-
 
 
 % Real Signal 
@@ -32,14 +27,13 @@ harmonic = harmonic(1:N);
 
 x = noise + harmonic;
 
-% Load Drum dictionary 
-load('xtrain');
-xtrain = xtrain(1:N)';
-
-
 [S, U, Y] = scattering(x, archs, phi_log2_oversampling, nmf_log2_oversampling);
 Smat_percOracle = CreateDictionaryScattering(noise, archs, phi_log2_oversampling, nmf_log2_oversampling,'all');
 Smat_harmoOracle = CreateDictionaryScattering(harmonic, archs, phi_log2_oversampling, nmf_log2_oversampling,'all');
+load('xtrain');
+xtrain = xtrain(1:N);
+Smat_Train = CreateDictionaryScattering(xtrain', archs, phi_log2_oversampling, nmf_log2_oversampling,'all');
+
 
 archs = downsample_archs(archs, nmf_log2_oversampling);
 [Smat_1, Smat_2, refs_1, refs_2] = format_scattering(S);
@@ -55,13 +49,12 @@ subplot(122); imagesc((Smat_2));
 F2 = size(Smat_2, 1);
 F = F1 + F2;
 
-%xtrain = rand(32768,1);
-W_perc = CreateDictionaryScattering(xtrain , archs, phi_log2_oversampling, nmf_log2_oversampling,'all');
-W_harmo = rand(F, 50);
-
+% W_perc = Smat_percOracle.^2;
+W_perc = Smat_Train.^2;
 H_perc = rand(size(W_perc,2), T);
 max_iter = 200;
 Smat = cat(1, Smat_1, Smat_2);
+W_harmo = rand(F,50);
 
 % SPNMF with no training permute the two layer in the synthetic case. 
 
@@ -71,8 +64,7 @@ Smat = cat(1, Smat_1, Smat_2);
 subplot(111);
 plot(e);
 
-subplot(121); imagesc(10*log10(W_harmo*W_harmo'*Smat),[-50 10]);
-subplot(122); imagesc(10*log10((W_perc * H_perc)));
+
 
 %% Begin reconstruction 
 
@@ -81,7 +73,8 @@ subplot(122); imagesc(10*log10((W_perc * H_perc)));
 
 Smat_harmo = sqrt(W_harmo*W_harmo'*Smat);
 Smat_perc = sqrt(W_perc * H_perc);
-
+subplot(121); imagesc((Smat_harmo));
+subplot(122); imagesc(((Smat_perc)));
 
 Smat1_perc = Smat_perc(1:F1, :);
 Smat2_perc = Smat_perc((F1+1):end, :);
@@ -152,11 +145,10 @@ Xharmo = dgtreal(harmonic,g,a,M);
 [F, T] = size(X);
 Wini = rand(F,50);
 
-load('xtrain');
-Wtrain = abs(dgtreal(noise,g,a,M));
+Wtrain = abs(dgtreal(xtrain,g,a,M));
 scale = sqrt(sum(Wtrain.^2,1)); 
 Wtrain = Wtrain .* repmat((scale+eps).^-1,F,1);
-WP =  Wtrain;
+WP =  Wtrain.^2;
 HPini = rand(size(WP,2),T);
 
 

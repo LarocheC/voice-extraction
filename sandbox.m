@@ -1,4 +1,5 @@
 %% Setup filter banks
+addpath(genpath('.'));
 clear opts;
 phi_log2_oversampling = 6;
 phi_oversampling = pow2(phi_log2_oversampling);

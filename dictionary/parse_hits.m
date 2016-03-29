@@ -13,15 +13,20 @@ hit_file_names = ...
     all_file_names(cellfun( @(x) strcmp(x(5:8), 'hits'), all_file_names));
 nHit_files = length(hit_file_names);
 
-%for hit_file_index = 1:nHit_files
-hit_file_index = 1;
+nfft = 1024;
+for hit_file_index = 1:nHit_files
     hit_file_name = hit_file_names{hit_file_index};
-    hit_file_path = fullfile(mix_path, hit_file_name);
+    hit_file_path = fullfile(mix_path, hit_file_name)
     x_indices = findstr(hit_file_path, 'x');
     last_x_index = x_indices(end);
-    nHits = str2num(hit_file_path((last_x_index+1):(end-4)))
-    stereo_waveform = audioread(hit_file_path);
+    nHits = str2num(hit_file_path((last_x_index+1):(end-4)));
+    [stereo_waveform, sample_rate] = audioread(hit_file_path);
     mono_waveform = mean(stereo_waveform, 2);
-    [peak_values, peak_locations] = findpeaks(abs(mono_waveform), ...
-        'NPeaks', nHits, 'sort', 'descend', 'MinPeakDistance', 10000)
-%end
+    odf = onset_detection_function(mono_waveform, sample_rate, nfft);
+    [peak_values, peak_locations] = ...
+        findpeaks(odf, ...
+        'NPeaks', nHits, ...
+        'sort', 'descend', ...
+        'MinPeakDistance', 44100 / nfft);
+    peak_locations = peak_locations * nfft;
+end

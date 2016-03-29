@@ -1,5 +1,4 @@
 function [archs, opts] = make_archs(N, T, nFilters_per_octave, phi_log2_oversampling)
-    %phi_log2_oversampling = 6;%log2(N/T); % check me
     opts{1}.time.T = T;
     opts{1}.time.nFilters_per_octave = nFilters_per_octave;
     opts{1}.time.has_duals = true;

@@ -1,7 +1,4 @@
-% For Vincent
-enst_drums_path = fullfile('~', 'datasets', 'ENST-drums-public');
-
-%%
+function hits = parse_hits(enst_drums_path)
 nDrummers = 3;
 hits = cell(1, nDrummers);
 
@@ -13,7 +10,8 @@ for drummer_index = 1:nDrummers
     dir_content = dir(mix_path);
     all_file_names = {dir_content(~[dir_content.isdir]).name};
     hit_file_names = ...
-        all_file_names(cellfun( @(x) strcmp(x(5:8), 'hits'), all_file_names));
+        all_file_names(cellfun( @(x) strcmp(x(5:8), 'hits'), ...
+        all_file_names));
     nHit_files = length(hit_file_names);
     
     nfft = 1024;
@@ -33,7 +31,7 @@ for drummer_index = 1:nDrummers
             findpeaks(odf, ...
             'NPeaks', nHits, ...
             'sort', 'descend', ...
-            'MinPeakDistance', 44100 / nfft);
+            'MinPeakDistance', round(44100 / nfft));
         nHits = length(hit_locations);
         hit_locations = hit_locations * nfft;
         hit_locations = sort(hit_locations, 'ascend');
@@ -67,4 +65,5 @@ for drummer_index = 1:nDrummers
         hits{drummer_index} = [hits{drummer_index}{:}];
     end
     hits = [hits{:}];
+end
 end

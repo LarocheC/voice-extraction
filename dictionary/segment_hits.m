@@ -10,7 +10,7 @@ for drummer_index = 1:nDrummers
     dir_content = dir(mix_path);
     all_file_names = {dir_content(~[dir_content.isdir]).name};
     hit_file_names = ...
-        all_file_names(cellfun( @(x) strcmp(x(5:8), 'hits'), all_file_names));
+        all_file_names(cellfun(@(x) strcmp(x(5:8), 'hits'), all_file_names));
     nHit_files = length(hit_file_names);
     
     nfft = 1024;

@@ -1,7 +1,4 @@
-% For Vincent
-enst_drums_path = fullfile('~', 'datasets', 'ENST-drums-public');
-
-%%
+function hits = segment_hits(enst_drums_path)
 nDrummers = 3;
 hits = cell(1, nDrummers);
 
@@ -67,4 +64,5 @@ for drummer_index = 1:nDrummers
         hits{drummer_index} = [hits{drummer_index}{:}];
     end
     hits = [hits{:}];
+end
 end

@@ -5,5 +5,5 @@
 % enst_drums_path = 'C:\Users\laroche\Desktop\ENST-drums-public';
 
 %%
-hits = parse_hits(enst_drums_path);
+hits = segment_hits(enst_drums_path);
 

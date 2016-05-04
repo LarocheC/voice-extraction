@@ -37,7 +37,7 @@ for drummer_index = 1:nDrummers
         hits{drummer_index}{hit_file_index} = cell(1, nHits);
         for hit_index = 1:nHits
             hit_location = hit_locations(hit_index);
-            hit_start = hit_location -  hit_length / 4;
+            hit_start = hit_location - hit_length/4;
             if hit_index > 1
                 hit_start = max(hit_start, hit_locations(hit_index-1));
             else
@@ -58,8 +58,13 @@ for drummer_index = 1:nDrummers
             if length(hit_waveform) < hit_length
                 hit_waveform = cat(1, hit_waveform, ...
                     zeros(hit_length - length(hit_waveform), 1));
+            else
+                hit_waveform = hit_waveform(1:hit_length);
             end
             hits{drummer_index}{hit_file_index}{hit_index} = hit_waveform;
+            if length(hit_waveform) > 131072
+                disp('x');
+            end
         end
         hits{drummer_index} = [hits{drummer_index}{:}];
     end

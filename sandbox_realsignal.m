@@ -12,27 +12,32 @@ archs = make_archs(N, T, nFilters_per_octave, phi_log2_oversampling);
 
 %% Generate probe signal
 
+% Real Signal
+drum_path = 'MusicDelta_FunkJazz_STEMS/MusicDelta_FunkJazz_STEM_01.wav';
+harmonic1_path = 'MusicDelta_FunkJazz_STEMS/MusicDelta_FunkJazz_STEM_02.wav';
+harmonic2_path = 'MusicDelta_FunkJazz_STEMS/MusicDelta_FunkJazz_STEM_03.wav';
 
-% Real Signal 
-[noise, fs] = audioread('MusicDelta_FunkJazz_STEMS/MusicDelta_FunkJazz_STEM_01.wav');
+[drum_signal, sr] = audioread(drum_path);
+harmonic1_signal = audioread(harmonic1_path);
+harmonic2_signal = audioread(harmonic2_path);
 
-[harmonic1, fs] = audioread('MusicDelta_FunkJazz_STEMS/MusicDelta_FunkJazz_STEM_02.wav');
-[harmonic2, fs] = audioread('MusicDelta_FunkJazz_STEMS/MusicDelta_FunkJazz_STEM_03.wav');
+drum_signal = mean(drum_signal, 2);
+drum_signal = drum_signal(1:N);
 
-noise = mean(noise,2);
-noise = noise(1:N);
+harmonic_signal = mean(harmonic1_signal + harmonic2_signal,2);
+harmonic_signal = harmonic_signal(1:N);
 
-harmonic = mean(harmonic1+harmonic2,2);
-harmonic = harmonic(1:N);
-
-x = noise + harmonic;
+x = drum_signal + harmonic_signal;
 
 [S, U, Y] = scattering(x, archs, phi_log2_oversampling, nmf_log2_oversampling);
-Smat_percOracle = CreateDictionaryScattering(noise, archs, phi_log2_oversampling, nmf_log2_oversampling,'all');
-Smat_harmoOracle = CreateDictionaryScattering(harmonic, archs, phi_log2_oversampling, nmf_log2_oversampling,'all');
+Smat_percOracle = CreateDictionaryScattering( ...
+    drum_signal, archs, phi_log2_oversampling, nmf_log2_oversampling,'all');
+Smat_harmoOracle = CreateDictionaryScattering( ...
+    harmonic_signal, archs, phi_log2_oversampling, nmf_log2_oversampling,'all');
 load('xtrain');
 xtrain = xtrain(1:N);
-Smat_Train = CreateDictionaryScattering(xtrain', archs, phi_log2_oversampling, nmf_log2_oversampling,'all');
+Smat_Train = CreateDictionaryScattering( ...
+    xtrain', archs, phi_log2_oversampling, nmf_log2_oversampling,'all');
 
 
 archs = downsample_archs(archs, nmf_log2_oversampling);
@@ -120,7 +125,7 @@ x_harmo = mask_scattering(S1_harmo, S2_harmo, U, Y, archs);
 %% Compute BSS score
 
 se = [x_perc' ; x_harmo'];
-s = [noise' ; x'-noise'];
+s = [drum_signal' ; x'-drum_signal'];
 
 [SDR,SIR,SAR,perm]=bss_eval_sources(se,s);
 
@@ -138,8 +143,8 @@ a = M/2;
 g = gabwin({'tight', 'hann'}, a, M);
 Ls = length(x);
 X = dgtreal(x,g,a,M);
-Xnoise = dgtreal(noise,g,a,M);
-Xharmo = dgtreal(harmonic,g,a,M);
+Xnoise = dgtreal(drum_signal,g,a,M);
+Xharmo = dgtreal(harmonic_signal,g,a,M);
 
 
 [F, T] = size(X);

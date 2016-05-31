@@ -61,6 +61,8 @@ for drummer_index = 1:nDrummers
             else
                 hit_waveform = hit_waveform(1:hit_length);
             end
+            hits{drummer_index}{hit_file_index}{hit_index} = hit_waveform;
+            
         end
     end
 end

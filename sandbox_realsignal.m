@@ -4,7 +4,7 @@ phi_log2_oversampling = 9;
 phi_oversampling = pow2(phi_log2_oversampling);
 nmf_log2_oversampling = 2;
 
-N = 2^19;
+N = 2^17;
 T = 2048;
 nFilters_per_octave = 8;
 

@@ -2,7 +2,7 @@
 % enst_drums_path = fullfile('~', 'datasets', 'ENST-drums-public');
 
 % For Clement
-% enst_drums_path = 'C:\Users\laroche\Desktop\ENST-drums-public';
+enst_drums_path = 'C:\Users\laroche\Desktop\ENST-drums-public';
 
 %% Segment hits
 hits = segment_hits(enst_drums_path);

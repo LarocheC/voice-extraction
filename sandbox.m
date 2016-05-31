@@ -57,11 +57,11 @@ subplot(122); imagesc(W_perc * H_perc)
 
 %% Begin reconstruction 
 
-Smat_perc = Smat_percOracle; % case oracle
-Smat_harmo = Smat_harmoOracle; % case oracle
+% Smat_perc = Smat_percOracle; % case oracle
+% Smat_harmo = Smat_harmoOracle; % case oracle
 
-%Smat_harmo = W_harmo*W_harmo'*Smat;
-%Smat_perc = W_perc * H_perc;
+Smat_harmo = W_harmo*W_harmo'*Smat;
+Smat_perc = W_perc * H_perc;
 
 
 Smat1_perc = Smat_perc(1:F1, :);
@@ -148,11 +148,11 @@ subplot(122); imagesc(10*log10(WP * HP),[-50 10])
 
 
 % Wiener Filtering and reconstruction of the signal
-%V_harmo = (W*W'*abs(X)).^2;
-%V_perc = (WP*HP).^2;
+V_harmo = (W*W'*abs(X)).^2;
+V_perc = (WP*HP).^2;
 
-V_harmo = abs(Xharmo).^2; %oracle case
-V_perc = abs(Xnoise).^2; %oracle case
+% V_harmo = abs(Xharmo).^2; %oracle case
+% V_perc = abs(Xnoise).^2; %oracle case
 
 V = V_harmo + V_perc;
 

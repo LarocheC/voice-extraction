@@ -30,7 +30,7 @@ for drummer_index = 1:nDrummers
             findpeaks(odf, ...
             'NPeaks', nHits, ...
             'sort', 'descend', ...
-            'MinPeakDistance', 44100 / nfft);
+            'MinPeakDistance', floor(44100 / nfft));
         nHits = length(hit_locations);
         hit_locations = hit_locations * nfft;
         hit_locations = sort(hit_locations, 'ascend');
@@ -61,13 +61,7 @@ for drummer_index = 1:nDrummers
             else
                 hit_waveform = hit_waveform(1:hit_length);
             end
-            hits{drummer_index}{hit_file_index}{hit_index} = hit_waveform;
-            if length(hit_waveform) > 131072
-                disp('x');
-            end
         end
-        hits{drummer_index} = [hits{drummer_index}{:}];
     end
-    hits = [hits{:}];
 end
 end

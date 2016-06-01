@@ -33,13 +33,6 @@ archs = make_archs(N, T, nFilters_per_octave, phi_log2_oversampling);
 [S, U, Y] = scattering(x, archs, phi_log2_oversampling, nmf_log2_oversampling);
 [Smat_1x, Smat_2x, refs_1, refs_2] = format_scattering(S);
 
-% [S, U, Y] = scattering(harmonic_signal(1:N), archs, phi_log2_oversampling, nmf_log2_oversampling);
-% [Smat_1Harmo, Smat_2Harmo, refs_1, refs_2] = format_scattering(S);
-% 
-% [S, U, Y] = scattering(drum_signal(1:N), archs, phi_log2_oversampling, nmf_log2_oversampling);
-% [Smat_1Percu, Smat_2Percu, refs_1, refs_2] = format_scattering(S);
-
-
 
 drummer_index = 2;
 hit_index = 1;
@@ -50,7 +43,7 @@ archs_Dictionary = make_archs(T, T, nFilters_per_octave, phi_log2_oversampling);
 for index=1:6
     [S1, U1, Y1] = scattering(hits{drummer_index}{hit_file_index(index)}{hit_index},...
         archs_Dictionary, phi_log2_oversampling, nmf_log2_oversampling);
-    [Smat_1, Smat_2, refs_1, refs_2] = format_scattering(S1);
+    [Smat_1, Smat_2, refs_1dict, refs_2dict] = format_scattering(S1);
     dictionary(index).Smat = cat(1, Smat_1, Smat_2);
     dictionary(index).U = U1;
     dictionary(index).Y = Y1;

@@ -6,6 +6,8 @@ nmf_log2_oversampling = 2;
 
 load('hits')
 
+N = 2^20;
+
 %% Real Signal
 drum_path = 'MusicDelta_FunkJazz_STEMS/MusicDelta_FunkJazz_STEM_01.wav';
 harmonic1_path = 'MusicDelta_FunkJazz_STEMS/MusicDelta_FunkJazz_STEM_03.wav';
@@ -29,7 +31,7 @@ nFilters_per_octave = 8;
 archs = make_archs(N, T, nFilters_per_octave, phi_log2_oversampling);
 
 [S, U, Y] = scattering(x, archs, phi_log2_oversampling, nmf_log2_oversampling);
-[Smat_1, Smat_2x, refs_1, refs_2] = format_scattering(S);
+[Smat_1x, Smat_2x, refs_1, refs_2] = format_scattering(S);
 
 % [S, U, Y] = scattering(harmonic_signal(1:N), archs, phi_log2_oversampling, nmf_log2_oversampling);
 % [Smat_1Harmo, Smat_2Harmo, refs_1, refs_2] = format_scattering(S);
@@ -73,11 +75,11 @@ W_perc = Smat_Dict;
 H_perc = rand(size(W_perc,2), T);
 max_iter = 200;
 Smat = cat(1, Smat_1x, Smat_2x);
-SmatHarmo = cat(1, Smat_1Harmo, Smat_2Harmo);
-SmatPercu = cat(1, Smat_1Percu, Smat_2Percu);
+% SmatHarmo = cat(1, Smat_1Harmo, Smat_2Harmo);
+% SmatPercu = cat(1, Smat_1Percu, Smat_2Percu);
 W_harmo = rand(F,50);
 
-% SPNMF with no training permute the two layer in the synthetic case. 
+% SPNMF 
 
 [W_harmo, H_perc, e] = ...
     SPNMF_KL_W2TRAIN(Smat, W_harmo, W_perc, H_perc, max_iter);
@@ -87,17 +89,14 @@ plot(e);
 Smat_harmo = W_harmo*W_harmo'*Smat;
 Smat_perc = W_perc * H_perc;
 
-subplot(221); imagesc(db(SmatHarmo),[-120 60]);
-subplot(222); imagesc(db(SmatPercu),[-120 60]);
-subplot(223); imagesc(db(Smat_harmo),[-120 60]);
-subplot(224); imagesc(db(Smat_perc),[-120 60]);
+% subplot(221); imagesc(db(SmatHarmo),[-120 60]);
+% subplot(222); imagesc(db(SmatPercu),[-120 60]);
+% subplot(223); imagesc(db(Smat_harmo),[-120 60]);
+% subplot(224); imagesc(db(Smat_perc),[-120 60]);
 
 
 %% Begin reconstruction 
 
-
-Smat_harmo = W_harmo*W_harmo'*Smat;
-Smat_perc = W_perc * H_perc;
 
 Smat1_perc = Smat_perc(1:F1, :);
 Smat2_perc = Smat_perc((F1+1):end, :);
